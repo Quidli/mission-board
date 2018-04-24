@@ -9,7 +9,8 @@
                  [ring/ring-jetty-adapter "1.6.3"]
                  [selmer "1.11.7"]
                  [grape "0.1.12-SNAPSHOT"]
-                 [com.auth0/java-jwt "3.3.0"]]
+                 [com.auth0/java-jwt "3.3.0"]
+                 [compojure "1.6.1"]]
   :main ^:skip-aot mission-board.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

@@ -1,6 +1,7 @@
 (ns mission-board.core
   (:require [ring.adapter.jetty :refer [run-jetty]]
             [selmer.parser :refer [render-file cache-off! set-resource-path!]]
+            [grape.core :refer [read-resource]]
             [grape.rest.route :refer [handler-builder]]
             [grape.hooks.core :refer [hooks]]
             [grape.store :refer [map->MongoDataSource]]
@@ -12,7 +13,9 @@
             [ring.middleware.cookies :refer [wrap-cookies]]
             [ring.middleware.json :refer [wrap-json-body wrap-json-response]]
             [ring.middleware.resource :refer [wrap-resource]]
-            [clojure.string :as s])
+            [compojure.core :refer :all]
+            [compojure.route :as route]
+            [mission-board.models.mission :refer [MissionResource]])
   (:gen-class))
 
 (cache-off!)
@@ -24,24 +27,13 @@
   {:config {}
    :hooks hooks
    :store (map->MongoDataSource {:db db})
-   :resources-registry {:accounts AccountResource}})
+   :resources-registry {:accounts AccountResource
+                        :missions MissionResource}})
 
-(defn handler [req]
-  {:status 200
-   :body (render-file "home.html" {})})
-
-(def config
-  {:domain "quidli.eu.auth0.com"
-   :issuer "https://quidli.eu.auth0.com/"
-   :client-id "4tpn3VEn16Lph6XiBl98W2LaWbHVWTJ9"
-   :signing-algorithm :hs256
-   :client-secret "wlX5ZUxnYP1DgdAhq4KYH-gdFsmFM2JE8MOTayfNG3wLOLectCOBGVzjWplxI_1m"
-   :scope "openid user_id name nickname email picture"
-   :callback-path "/auth/callback"
-   :error-redirect "/login"
-   :success-redirect "/"
-   :logout-handler "/logout"
-   :logout-redirect "/"})
+(defroutes handler
+  (GET "/" [] (render-file "home.html" {}))
+  (GET "/missions" [] (render-file "missions.html" {:missions (:_documents (read-resource deps MissionResource {} {:relations {:account {}}}))}))
+  (route/not-found "<h1>Oops, page not found</h1>"))
 
 (defn -main
   "I don't do a whole lot ... yet."

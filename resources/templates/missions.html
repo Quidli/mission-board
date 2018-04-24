@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block body %}
+     <!-- ==============================================
+	 Header
+	 =============================================== -->
+     <header class="header-jobs" style="height:22vh">
+      <div class="container">
+	   <div class="content" style="margin-top:100px">
+	    <div class="row">
+		 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		  <a href="login.html" style="margin-top:0;" class="kafe-btn kafe-btn-mint full-width revealOnScroll" data-animation="bounceIn" data-timeout="400"><i class="fa fa-tags"></i> Post a Job, It’s Free!</a>
+		 </div><!-- /.col-lg-3 -->
+        </div><!-- /.row -->
+       </div><!-- /.content -->
+	  </div><!-- /.container -->
+     </header><!-- /header -->
+
+     <!-- ==============================================
+	 Jobs Section
+	 =============================================== -->
+     <section class="jobslist">
+	  <div class="container-fluid">
+	   <div class="row-fluid">
+
+	    <div class="col-lg-4">
+
+		 <div class="list">
+		  <div class="list-group">
+
+           <span class="list-group-item active cat-top">
+            <em class="fa fa-fw fa-building text-white"></em>&nbsp;&nbsp;&nbsp;Companies
+            <!-- <span class="badge">1</span> -->
+		   </span>
+           <a href="/companies/quidli/missions" class="list-group-item cat-list">
+            &nbsp;&nbsp;&nbsp;Quidli
+            <!-- <span class="badge text-red-bg">50+</span> -->
+		   		 </a>
+           <a href="jobs.html" class="list-group-item cat-list">
+            &nbsp;&nbsp;&nbsp;Squilight
+            <!-- <span class="badge text-red-bg">15</span> -->
+		   		</a>
+          </div><!-- /.list-group -->
+		 </div><!-- /.list -->
+
+		</div><!-- /.col-lg-4 -->
+	    <div class="col-lg-8 white">
+
+		 <form action="#" method="get" class="list-search revealOnScroll" data-animation="fadeInDown" data-timeout="200">
+		  <button><i class="fa fa-search"></i></button>
+		  <input type="text" class="form-control" placeholder="Job title, keywords or company name" value=""/>
+		  <div class="clearfix"></div>
+		 </form>
+
+		  <h6>We found 1 missions</h6>
+
+			{% for mission in missions %}
+
+		 <div class="job">
+
+		  <div class="row top-sec">
+		   <div class="col-lg-12">
+			<!-- <div class="col-lg-2 col-xs-12">
+			 <a href="freelancer.html">
+			  <img class="img-responsive" src="img/users/1.png" alt="">
+			 </a>
+			</div> -->
+			<div class="col-lg-12 col-xs-12">
+			 <h4><a href="jobpost.html">{{mission.title}}</a></h4>
+			 <h5>Quidli <small>(proposed by {{mission.account.name}})</small></h5>
+			</div><!-- /.col-lg-10 -->
+
+		   </div><!-- /.col-lg-12 -->
+		  </div><!-- /.row -->
+
+		  <div class="row mid-sec">
+		   <div class="col-lg-12">
+		   <div class="col-lg-12">
+			<hr class="small-hr">
+			<p>{{mission.description}}</p>
+			{% for keyword in mission.keywords %}
+			<span class="label label-success">{{keyword}}</span>
+			{% endfor %}
+		   </div><!-- /.col-lg-12 -->
+		   </div><!-- /.col-lg-12 -->
+		  </div><!-- /.row -->
+
+		  <div class="row bottom-sec">
+		   <div class="col-lg-12">
+
+			<div class="col-lg-12">
+			 <hr class="small-hr">
+			</div>
+
+			<div class="col-lg-2">
+			 <h5> Posted </h5>
+			 <p>{{mission._created}}</p>
+			</div>
+			<div class="col-lg-2">
+			 <h5> Location </h5>
+			 <p><i class="fa fa-map-marker"></i> Remote</p>
+			</div>
+			<div class="col-lg-2">
+			 <h5> Budget </h5>
+			 <p>{{mission.equity_percent}}</p>
+			</div>
+			<div class="col-lg-2">
+			 <h5> Applicants </h5>
+			 <p>0</p>
+			</div>
+			<div class="col-lg-4">
+			 <a href="jobpost.html" class="kafe-btn kafe-btn-mint-small"><i class="fa fa-align-left"></i> Send Proposal</a>
+			</div>
+
+		   </div><!-- /.col-lg-12 -->
+		  </div><!-- /.row -->
+
+		 </div><!-- /.job -->
+
+     {% endfor %}
+
+	    </div><!-- /.col-lg-8 -->
+	   </div><!-- /.row -->
+	  </div><!-- /.container-fluid -->
+     </section><!-- /section -->
+
+{% endblock %}

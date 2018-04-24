@@ -49,7 +49,7 @@
       header .form-row .radio-left a, header .form-row .radio-right a {
         padding-top: 18px;
       }
-      .job:after {
+      .job.last:after {
         content: "";
         width: 100%;
         height: 100%;
@@ -60,6 +60,8 @@
     </style>
 </head>
 <body>
+
+  {% include "includes/navbar.html" %}
 
   {% block body %}{% endblock %}
 
