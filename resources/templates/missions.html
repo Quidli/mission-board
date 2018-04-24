@@ -19,7 +19,7 @@
      <!-- ==============================================
 	 Jobs Section
 	 =============================================== -->
-     <section class="jobslist">
+     <section class="jobslist" id="jobsApp">
 	  <div class="container-fluid">
 	   <div class="row-fluid">
 
@@ -30,33 +30,37 @@
 
            <span class="list-group-item active cat-top">
             <em class="fa fa-fw fa-building text-white"></em>&nbsp;&nbsp;&nbsp;Companies
+						&nbsp;<a v-if="company" @click="filterForCompany(null)">(Reset company filter)</a>
+						</button>
             <!-- <span class="badge">1</span> -->
-		   </span>
-           <a href="/companies/quidli/missions" class="list-group-item cat-list">
-            &nbsp;&nbsp;&nbsp;Quidli
+		   		 </span>
+					 {% for company in companies %}
+           <a href="#" class="list-group-item cat-list" @click="filterForCompany('{{company._id}}', '{{company.name}}')">
+            &nbsp;&nbsp;&nbsp;{{company.name}}
             <!-- <span class="badge text-red-bg">50+</span> -->
 		   		 </a>
-           <a href="jobs.html" class="list-group-item cat-list">
-            &nbsp;&nbsp;&nbsp;Squilight
-            <!-- <span class="badge text-red-bg">15</span> -->
-		   		</a>
+					 {% endfor %}
           </div><!-- /.list-group -->
 		 </div><!-- /.list -->
 
 		</div><!-- /.col-lg-4 -->
 	    <div class="col-lg-8 white" style="padding-bottom:30px">
 
-		 <form action="#" method="get" class="list-search revealOnScroll" data-animation="fadeInDown" data-timeout="200">
-		  <button><i class="fa fa-search"></i></button>
-		  <input type="text" class="form-control" placeholder="Job title, keywords or company name" value=""/>
+		 <div class="list-search revealOnScroll" data-animation="fadeInDown" data-timeout="200">
+		  <button @click="fetchMissions()">
+				<i class="fa fa-spinner" v-if="loading"></i>
+				<i class="fa fa-search" v-if="!loading"></i>
+			</button>
+		  <input type="text" class="form-control" placeholder="Job title, keywords or company name" v-model="query" @keyup.enter="fetchMissions()"/>
 		  <div class="clearfix"></div>
-		 </form>
+		</div>
 
-		  <h6>We found {{count}} missions</h6>
+		  <h6>We found ${count} mission<span v-if="count > 1">s</span>
+				${queryInfo}
+				<a v-if="queryInfo" @click="reset">(reset)</a>
+			</h6>
 
-			{% for mission in missions %}
-
-		 <div class="job">
+		 <div class="job" v-for="mission in missions">
 
 		  <div class="row top-sec">
 		   <div class="col-lg-12">
@@ -66,8 +70,8 @@
 			 </a>
 			</div> -->
 			<div class="col-lg-12 col-xs-12">
-			 <h4><a href="jobpost.html">{{mission.title}}</a></h4>
-			 <h5>Quidli <small>(proposed by {{mission.account.name}})</small></h5>
+			 <h4><a href="jobpost.html">${mission.title}</a></h4>
+			 <h5>${mission.company.name} <small>(proposed by ${mission.account.name})</small></h5>
 			</div><!-- /.col-lg-10 -->
 
 		   </div><!-- /.col-lg-12 -->
@@ -77,10 +81,8 @@
 		   <div class="col-lg-12">
 		   <div class="col-lg-12">
 			<hr class="small-hr">
-			<p>{{mission.description}}</p>
-			{% for keyword in mission.keywords %}
-			<span class="label label-success">{{keyword}}</span>
-			{% endfor %}
+			<p>${mission.description}</p>
+			<span class="label label-success" v-for="keyword in mission.keywords">${keyword}</span>
 		   </div><!-- /.col-lg-12 -->
 		   </div><!-- /.col-lg-12 -->
 		  </div><!-- /.row -->
@@ -94,15 +96,16 @@
 
 			<div class="col-lg-2">
 			 <h5> Posted </h5>
-			 <p>{{mission._created}}</p>
+			 <p>${mission._created}</p>
 			</div>
 			<div class="col-lg-2">
 			 <h5> Location </h5>
 			 <p><i class="fa fa-map-marker"></i> Remote</p>
 			</div>
 			<div class="col-lg-2">
-			 <h5> Budget </h5>
-			 <p>{{mission.equity_percent}}</p>
+			 <h5> Equity </h5>
+			 <p>
+				 ${mission.equity_percent}%</p>
 			</div>
 			<div class="col-lg-2">
 			 <h5> Applicants </h5>
@@ -117,11 +120,76 @@
 
 		 </div><!-- /.job -->
 
-     {% endfor %}
-
 	    </div><!-- /.col-lg-8 -->
 	   </div><!-- /.row -->
 	  </div><!-- /.container-fluid -->
      </section><!-- /section -->
+
+		 <script type="text/javascript">
+		 var jobsApp = new Vue({
+			 el: '#jobsApp',
+			 delimiters: ['${', '}'],
+			 data: {
+				 company: null,
+				 query: null,
+				 count: 0,
+				 missions: [],
+				 loading: false,
+				 queryInfo: null
+			 },
+			 methods: {
+				 fetchMissions: function() {
+					 this.loading = true;
+					 var apiQuery = {find: {}, relations: {account: {}, company: {}}};
+					 if (this.query) {
+						 var regexClause = {"$regex": this.query};
+						 apiQuery.find = {
+							 "$or": [{company_name: regexClause}, {title: regexClause}, {keywords: regexClause}]
+						 };
+					 }
+					 if (this.company) {
+						 apiQuery.find = {"$and": [apiQuery.find, {company: this.company._id}]};
+					 }
+					 var self = this;
+					 axios
+			       .get('/api/missions?query=' + JSON.stringify(apiQuery))
+			       .then(function(response) {
+							 console.log("api resp", response);
+							 self.count = response.data._count;
+							 self.missions = response.data._items;
+							 self.loading = false;
+							 if (self.company || self.query) {
+							   self.queryInfo = '( ';
+								 if (self.company) {
+									 self.queryInfo += 'company = ' + self.company.name;
+									 if (self.company && self.query) {
+										 self.queryInfo += " AND ";
+									 }
+								 }
+								 if (self.query) {
+									 self.queryInfo += 'query = ' + self.query;
+								 }
+								 self.queryInfo += ' )';
+							 } else {
+								 self.queryInfo = "";
+							 }
+						 });
+				 },
+				 filterForCompany: function(companyId, companyName) {
+					 var company = companyId ? {_id: companyId, name: companyName} : null;
+					 this.company = company;
+					 this.fetchMissions();
+				 },
+				 reset: function() {
+					 this.query = null;
+					 this.company = null;
+					 this.fetchMissions();
+				 }
+			 },
+			 mounted: function() {
+		     this.fetchMissions()
+		   }
+		 });
+		 </script>
 
 {% endblock %}

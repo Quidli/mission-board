@@ -7,6 +7,8 @@
 (def MissionResource
   {:schema {(? :_id) (s/maybe ObjectId)
             :account (resource-embedded :accounts :account ObjectId)
+            :company (resource-embedded :companies :company ObjectId)
+            (? :company_name) (s/maybe s/Str)
             :title s/Str
             :status (s/enum "draft" "published" "closed")
             :equity_percent s/Num
