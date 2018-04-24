@@ -30,9 +30,13 @@
    :resources-registry {:accounts AccountResource
                         :missions MissionResource}})
 
+(defn missions-handler []
+  (let [{missions :_documents count :_count} (read-resource deps MissionResource {} {:relations {:account {}} :opts {:count? true}})]
+    (render-file "missions.html" {:missions missions :count count})))
+
 (defroutes handler
   (GET "/" [] (render-file "home.html" {}))
-  (GET "/missions" [] (render-file "missions.html" {:missions (:_documents (read-resource deps MissionResource {} {:relations {:account {}}}))}))
+  (GET "/missions" [] (missions-handler))
   (route/not-found "<h1>Oops, page not found</h1>"))
 
 (defn -main
