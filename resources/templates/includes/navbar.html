@@ -1,0 +1,24 @@
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar">
+   <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+  <a class="navbar-brand" style="margin-top:0"><img src="logo.png" style="height:50px" /></a>
+    <input type="checkbox" id="toggle" />
+  <label for="toggle" class="toggle"></label>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+ <ul class="menu">
+  <li><a href="/">Home</a></li>
+  <li><a href="/missions">Missions</a></li>
+  <li><a href="/contributors">Contributors</a></li>
+  <li v-if="!isLogged"><a v-on:click="login">Connect</a></li>
+  <li v-if="isLogged" class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Welcome ${profile.given_name} <b class="caret"></b></a>
+   <ul class="dropdown-menu">
+    <li><a href="#">Proposed missions</a></li>
+    <li><a href="#">Applied missions</a></li>
+    <li><a href="#">View my profile</a></li>
+    <li><a v-on:click="logout" href="#">Logout</a></li>
+   </ul>
+  </li>
+ </ul><!-- /.ul.menu -->
+   </div><!-- /.container -->
+  </nav><!-- /.nav -->
