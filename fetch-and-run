@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+git pull --rebase
+docker-compose kill && docker-compose rm -f
+docker-compose build
+docker-compose up -d
